@@ -6,10 +6,11 @@
 -
 
   # Target: where our play will run and options it will run with
+  hosts: local
   gather_facts: false
   # Variable: variables that will apply to the play, on all target systems
   vars:
-    vcenter_hostname: den06cvircen06
+    vcenter_hostname: den06uesx52.svc.west.com
     vcenter_username: ngsee@corp.westworlds.com
     vcenter_password: Winter2018!
     vm_name: test_win2k12_180808_NGS
