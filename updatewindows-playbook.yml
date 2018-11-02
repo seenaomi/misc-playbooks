@@ -15,7 +15,7 @@
     vm_name: test_win2k12_180808_NGS
   # Task: the list of tasks that will be executed within the play, this section
   # can also be used for pre and post tasks
-  task: 
+  tasks: 
     - name: Set powerstate of a virtual machine to poweron
       vmware_guest:
         hostname: "{{ vcenter_hostname }}"
