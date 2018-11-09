@@ -1,0 +1,26 @@
+---
+# YAML documents begin with the document separator ---
+
+# This playbook will log into the windows template vm that is already poweredon and stop the VCACGuestAgent Service
+-
+
+  # Target: where our play will run and options it will run with
+  hosts: windows
+  gather_facts: false
+
+  # Variable: variables that will apply to the play, on all target systems
+    
+  # Task: the list of tasks that will be executed within the play, this section
+  # can also be used for pre and post tasks
+  tasks: 
+    - name: Stop service VCACGuestAgentService 
+      win_service:
+        name: VCACGuestAgentService
+        state: stopped
+
+  # Handlers: handlers that are executed as a notify key from a task
+
+  # Roles: list of roles to be imported into the play
+
+# Three dots indicate the end of a YAML document
+...

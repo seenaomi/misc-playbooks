@@ -1,0 +1,32 @@
+---
+# YAML documents begin with the document separator ---
+
+# This playbook will log into Windows guest_vm, remove the old VCACGusetAgentService file directory and replace it
+-
+
+  # Target: where our play will run and options it will run with
+  hosts: windows
+  gather_facts: false
+
+  # Variable: variables that will apply to the play, on all target systems
+    
+  # Task: the list of tasks that will be executed within the play, this section
+  # can also be used for pre and post tasks
+  tasks: 
+    - name: Remove service VCACGuestAgent file directory
+      win_file:
+        path: C:\vrmguestagent
+        state: absent
+
+    - name: Replace service VCAGuestAgent with new file directory
+      win_copy:
+        src: C:\westcorp\installs\gugentzip_x64\vrmguestagent
+        dest: C:\
+        remote_src: yes
+        
+  # Handlers: handlers that are executed as a notify key from a task
+
+  # Roles: list of roles to be imported into the play
+
+# Three dots indicate the end of a YAML document
+...

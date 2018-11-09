@@ -1,30 +1,33 @@
 ---
 # YAML documents begin with the document separator ---
 
-# The minus in YAML this indicates a list item.  The playbook contains a list 
-# of plays, with each play being a dictionary
+# This playbook will log into vcenter den06 and upgrade vmware tools on a powered on VM
 -
 
   # Target: where our play will run and options it will run with
-  hosts: local
-  gather_facts: false
+  hosts: localhost
+  gather_facts: true
+
   # Variable: variables that will apply to the play, on all target systems
   vars:
-    vcenter_hostname: den06uesx52.svc.west.com
+    vcenter_hostname: 10.70.72.251
     vcenter_username: ngsee@corp.westworlds.com
-    vcenter_password: Winter2018!
-    vm_name: test_win2k12_180808_NGS
+    vcenter_password: <password>
+    datacenter_name: cloud_dc01
+    guest_name: test_win2k12_180808_NGS
+    
   # Task: the list of tasks that will be executed within the play, this section
   # can also be used for pre and post tasks
   tasks: 
-    - name: Set powerstate of a virtual machine to poweron
-      vmware_guest:
+    - name: Upgrade VMWare Guest Tools if needed
+      vmware_guest_tools_upgrade:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter_name }}"
         validate_certs: no
-        name: "{{ vm_name }}"
-        state: poweron
+        folder: /"{{ datacenter_name }}"/WindowsTemplates/TestTemplates
+        name: "{{ guest_name }}"
 
   # Handlers: handlers that are executed as a notify key from a task
 
