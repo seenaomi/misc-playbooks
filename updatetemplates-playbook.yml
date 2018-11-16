@@ -1,0 +1,131 @@
+---
+# YAML documents begin with the document separator ---
+
+# This playbook will log into the windows template vm that is already poweredon and stop the VCACGuestAgent Service
+-  hosts: localhost
+   gather_facts: true
+   tasks: 
+    - name: Include vars for den06 vcenter
+      include_vars:
+        dir: 'group_vars'
+        files_matching: 'den06.yml'
+
+    - name: Set powerstate of a virtual machine to poweron
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        folder: /"{{ datacenter_name }}"/WindowsTemplates/TestTemplates
+        name: "{{ item.guest_name }}"
+        state: poweredon
+      loop:
+        - { guest_name: 'test_win2k12_180808_NGS' }
+        - { guest_name: 'test_win2016_111508_NGS' }
+
+-  hosts: windows
+   gather_facts: false
+   tasks: 
+    - name: Stop service VCACGuestAgentService 
+      win_service:
+        name: VCACGuestAgentService
+        state: stopped
+
+    - name: Remove service VCACGuestAgent service 
+      win_service:
+        name: VCACGuestAgentService
+        state: absent
+
+    - name: Reboot guest   
+      win_reboot:
+        msg: "Windows is rebooting now"
+
+    - name: Remove service VCACGuestAgent file directory
+      win_file:
+        path: C:\vrmguestagent
+        state: absent
+
+    - name: Replace service VCAGuestAgent with new file directory
+      win_copy:
+        src: C:\westcorp\installs\gugentzip_x64\vrmguestagent
+        dest: C:\
+        remote_src: yes
+
+    - name: Check for updates
+      win_updates:
+        state: searched
+        log_path: C:\ansible_wu.txt
+      register: update_count
+
+    - name: List missing updates
+      debug:
+        var: update_count
+
+    - name: Run windows update
+      win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+          - UpdateRollups
+        log_path: C:\ansible_wu.txt
+      register: win_updates_result
+
+    - name: Status of update
+      debug:
+        var: win_updates_result
+
+    - name: "Reboot when updates installed."
+      win_reboot:
+        shutdown_timeout_sec: 3600
+        reboot_timeout_sec: 3600
+      when: win_updates_result.reboot_required
+      register: reboot_status
+
+    - block:
+        - debug:
+            msg: |
+              Host {{ inventory_hostname }} has been patched and rebooted (if required). {{ win_updates_result.installed_update_count }} updates were installed. The updates installed were:
+              {% for key, value in win_updates_result.updates.iteritems() %}
+                - {{ value.title }}
+              {% endfor %}       
+    
+    - name: Reinstall service VCACGuestAgentService
+      win_command: Winservice.exe -i -h mandem.svc.west.com:443 -p ssl
+      args:
+        chdir: C:\vrmguestagent
+
+    - name: Check if service is installed
+      win_service:
+        name: VCACGuestAgentService
+      register: service_info
+    - debug:
+        var: service_info
+
+-  hosts: localhost
+   gather_facts: true
+
+   tasks:
+    - name: Include vars for den06 vcenter
+      include_vars:
+        dir: 'group_vars'
+        files_matching: 'den06.yml'
+
+    - name: Set powerstate of a virtual machine to poweron
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        folder: /"{{ datacenter_name }}"/WindowsTemplates/TestTemplates
+        name: "{{ item.guest_name }}"
+        state: shutdown-guest
+      loop:
+        - { guest_name: 'test_win2k12_180808_NGS' }
+        - { guest_name: 'test_win2016_111508_NGS' }    
+
+  # Handlers: handlers that are executed as a notify key from a task
+
+  # Roles: list of roles to be imported into the play
+
+# Three dots indicate the end of a YAML document
+...

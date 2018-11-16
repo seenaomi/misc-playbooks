@@ -1,0 +1,11 @@
+---
+# DOMAIN HAS TO BE IN CAPS
+# SERVICE VM CREDS
+
+ansible_user: dm-ngsee@CORP.WESTWORLDS.COM
+ansible_password: <password>
+ansible_connection: winrm
+ansible_winrm_transport: kerberos
+ansible_winrm_server_cert_validation: ignore
+
+...

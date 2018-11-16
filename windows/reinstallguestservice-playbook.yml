@@ -6,20 +6,16 @@
 -
 
   # Target: where our play will run and options it will run with
-  hosts: localhost
-  gather_facts: true
+  hosts: windows
+  gather_facts: false
 
   # Variable: variables that will apply to the play, on all target systems
-  vars:
-    connection: winrm
-    remote_user: OLA
-    remote_password: <password>
-    
+
   # Task: the list of tasks that will be executed within the play, this section
   # can also be used for pre and post tasks
-  tasks: 
-    - name: Reinstall service VCACGuestAgentService 
-      win_command: Winservice.exe –i –h mandem.svc.west.com:443 –p ssl
+  tasks:
+    - name: Reinstall service VCACGuestAgentService
+      win_command: Winservice.exe -i -h mandem.svc.west.com:443 -p ssl
       args:
         chdir: C:\vrmguestagent
 
@@ -27,9 +23,8 @@
       win_service:
         name: VCACGuestAgentService
       register: service_info
-
-    - name: Shutdown VM when Service is installed
-        
+    - debug:
+        var: service_info
 
   # Handlers: handlers that are executed as a notify key from a task
 

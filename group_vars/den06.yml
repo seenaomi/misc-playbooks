@@ -1,0 +1,8 @@
+---
+
+vcenter_hostname: 10.70.72.251
+vcenter_username: ngsee@corp.westworlds.com
+vcenter_password: <password>
+datacenter_name: cloud_dc01
+
+...

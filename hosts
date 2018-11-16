@@ -1,5 +1,6 @@
-[den06]
-10.70.72.251
-
 [windows]
-10.70.97.0
+2012R2 ansible_host=10.70.97.0
+2016 ansible_host=10.70.112.50
+
+[jumpbox]
+wcw33095.corp.westworlds.com
